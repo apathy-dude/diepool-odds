@@ -15,21 +15,37 @@ export function Roll(dice: number, tn: number): number[] {
     while (!rollCache[dice]) {
         const max = rollCache.length - 1;
         if (max * 2 <= dice) { // Double it to grow as quickly as possible
-            rollCache[max * 2] = multiply(rollCache[max], rollCache[max]);
+            rollCache[max * 2] = Multiply(rollCache[max], rollCache[max]);
         }
         else { // Add max and next highest that will add together to be at or below target
             let idx = dice - max;
             while (!rollCache[idx]) idx--;
 
-            rollCache[max + idx] = multiply(rollCache[max], rollCache[idx]);
+            rollCache[max + idx] = Multiply(rollCache[max], rollCache[idx]);
         }
     }
 
     return rollCache[dice];
 }
 
+export function SubtractSingleMultiplyPerIndex(oddArray: number[], singleTn: number): number[] {
+    if (singleTn > 6) return oddArray;
+
+    return oddArray
+        .map((o1: number, idx: number) => new Array(idx).fill(0)
+        .concat(Roll(idx, singleTn).map((o2: number) => o2 * o1)))
+        .reduce((odds: number[], d: number[], y: number): number[] => {
+            d.forEach((o, x) => {
+                const idx = x - y < 0 ? 0 : x - y;
+                odds[idx] = odds[idx] || 0;
+                odds[idx] += o;
+            });
+            return odds;
+         }, []);
+}
+
 // Array multiplaction of [1, n] * [m, 1]
-function multiply(odds1: number[], odds2: number[]) {
+export function Multiply(odds1: number[], odds2: number[]): number[] {
     return odds1
         .map((o1: number) => odds2.map((o2: number) => o2 * o1))
         .reduce(addOdds, []);
@@ -39,7 +55,7 @@ function multiply(odds1: number[], odds2: number[]) {
 // by adding the value of a cell to x + y value of the target array
 // e.g. [ [1,  2,  4],
 //        [8, 16, 32] ] => [ 1, 2 + 8, 4 + 16, 32 ] => [ 1, 10, 20, 32 ]
-function addOdds(odds: number[], d: number[], idx: number) {
+function addOdds(odds: number[], d: number[], idx: number): number[] {
     d.forEach((o, i) => {
         odds[idx + i] = odds[idx + i] || 0;
         odds[idx + i] += o;

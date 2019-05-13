@@ -4,9 +4,14 @@
       <v-card-text>
         <v-layout row wrap>
           <v-text-field
-            label="Dice"
+            label="Attack Pool"
             type="number"
             v-model="dice"
+          ></v-text-field>
+          <v-text-field
+            label="Defence Target Number"
+            type="number"
+            v-model="defence"
           ></v-text-field>
         </v-layout>
       </v-card-text>
@@ -14,7 +19,7 @@
 
     <v-layout row>
       <v-flex xs12>
-        <odd-table :dice="dice"></odd-table>
+        <odd-table :dice="dice" :defence="defence"></odd-table>
       </v-flex>
     </v-layout>
   </div>
@@ -31,6 +36,7 @@ import OddTable from './OddTable.vue';
 })
 export default class Odds extends Vue {
   private d: number = 6;
+  private def: number = 6;
 
   get dice(): number {
      return this.d;
@@ -47,6 +53,23 @@ export default class Odds extends Vue {
     }
 
     this.d = parseInt(value, 10);
+  }
+
+  get defence(): number {
+    return this.def;
+  }
+  set defence(value: number) {
+    if (typeof(value) === 'number') {
+      this.def = value;
+      return;
+    }
+
+    if (value === '') {
+      this.def = 0;
+      return;
+    }
+
+    this.def = parseInt(value, 10);
   }
 }
 </script>

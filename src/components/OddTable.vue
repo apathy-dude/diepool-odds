@@ -20,7 +20,7 @@ import Vue from 'vue';
 import Component from 'vue-class-component';
 import { Prop } from 'vue-property-decorator';
 import OddColumn from './OddColumn.vue';
-import { Roll } from '../services/OddsService';
+import { Roll, SubtractSingleMultiplyPerIndex } from '../services/OddsService';
 
 @Component({
   name: 'odd-table',
@@ -30,9 +30,10 @@ import { Roll } from '../services/OddsService';
 })
 export default class OddTable extends Vue {
   @Prop({ required: true }) public dice!: number;
+  @Prop({ required: true }) public defence!: number;
 
   public rollSum(tn: number): number[] {
-    const roll: number[] = Roll(this.dice, tn);
+    const roll: number[] = SubtractSingleMultiplyPerIndex(Roll(this.dice, tn), this.defence);
     const rollSum: number[] = [1];
     for (let i = 1; i < roll.length; i++)
       rollSum[i] = rollSum[i - 1] - roll[i - 1];

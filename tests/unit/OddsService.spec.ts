@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { Roll } from '@/services/OddsService';
+import { Roll, SubtractSingleMultiplyPerIndex } from '@/services/OddsService';
 
 describe('OddsService.ts Roll', () => {
   it('Returns 100% chance of 0 hits on 0 dice', () => {
@@ -27,23 +27,28 @@ describe('OddsService.ts Roll', () => {
     expect(response).to.eql([.25, .5, .25]);
   });
 
-  /*
-  000 = 0
-  001 = 1
-  010 = 1
-  011 = 2
-  100 = 1
-  101 = 2
-  110 = 2
-  111 = 3
-  0 = 1/8
-  1 = 3/8
-  2 = 3/8
-  3 = 1/8
-  */
-
   it('Returns 12.5/37.5/37.5/12.5 for 3 dice when TN is 4', () => {
     const response = Roll(3, 4);
     expect(response).to.eql([1 / 8, 3 / 8, 3 / 8, 1 / 8]);
+  });
+});
+
+describe('OddsService.ts Subtract', () => {
+  it('Halves a single hit when there\'s a 50% to subtract a single hit', () => {
+    const halfSingleHit = [0.5, 0.5];
+    const response = SubtractSingleMultiplyPerIndex(halfSingleHit, 4);
+    expect(response).to.eql([0.75, 0.25]);
+  });
+
+  it('Multiplies 6+ properly for 4+ on 2d6', () => {
+    const original = Roll(2, 4); // [ 0.25, 0.5, 0.25]
+    const target = 6; // 1/6
+    const response = SubtractSingleMultiplyPerIndex(original, target)
+      .map((r: number) => r.toFixed(6));
+    const ex = [49 / 144, 70 / 144, 25 / 144]
+      .map((r: number) => r.toFixed(6));
+    // Testing to 6 decimal places since there's floating point
+    // percision errors and 6 decimal places is close enough
+    expect(response).to.eql(ex);
   });
 });
