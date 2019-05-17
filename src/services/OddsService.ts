@@ -11,7 +11,7 @@ export function Roll(dice: number, tn: number): number[] {
         return arr;
     }
 
-    const rollCache: number[][] = [ [1], [(7 - tn) / 6, (tn - 1) / 6] ];
+    const rollCache: number[][] = [ [1], [(tn - 1) / 6, (7 - tn) / 6] ];
     while (!rollCache[dice]) {
         const max = rollCache.length - 1;
         if (max * 2 <= dice) { // Double it to grow as quickly as possible
@@ -28,27 +28,32 @@ export function Roll(dice: number, tn: number): number[] {
     return rollCache[dice];
 }
 
-export function SubtractSingleMultiplyPerIndex(oddArray: number[], singleTn: number): number[] {
-    if (singleTn > 6) return oddArray;
+export function SubtractMultiply(oddArray: number[], subArray: number[]): number[] {
+    if (!subArray || subArray.length < 2) return oddArray;
+    const initArray = new Array(oddArray.length).fill(0);
 
     return oddArray
-        .map((o1: number, idx: number) => new Array(idx).fill(0)
-        .concat(Roll(idx, singleTn).map((o2: number) => o2 * o1)))
-        .reduce((odds: number[], d: number[], y: number): number[] => {
-            d.forEach((o, x) => {
-                const idx = x - y < 0 ? 0 : x - y;
-                odds[idx] = odds[idx] || 0;
-                odds[idx] += o;
-            });
-            return odds;
-         }, []);
+        .map((o1: number) => subArray
+            .map((o2: number) => o2 * o1))
+        .reduce(subtractOdds, initArray);
+}
+
+export function SubtractSingleMultiplyPerIndexWithBonus(oddArray: number[], singleTn: number, bonusPool: number): number[] {
+    if (singleTn > 6) return oddArray;
+    const initArray = new Array(oddArray.length).fill(0);
+
+    return oddArray
+        .map((o1: number, idx: number) => Roll(idx + bonusPool, singleTn)
+                .map((o2: number) => o1 * o2))
+        .reduce(subtractOdds, initArray);
 }
 
 // Array multiplaction of [1, n] * [m, 1]
 export function Multiply(odds1: number[], odds2: number[]): number[] {
+    const initArray = new Array(odds1.length + odds2.length - 1).fill(0);
     return odds1
         .map((o1: number) => odds2.map((o2: number) => o2 * o1))
-        .reduce(addOdds, []);
+        .reduce(addOdds, initArray);
 }
 
 // Merge array [n, m] by putitng it into an array of n + m size
@@ -56,9 +61,14 @@ export function Multiply(odds1: number[], odds2: number[]): number[] {
 // e.g. [ [1,  2,  4],
 //        [8, 16, 32] ] => [ 1, 2 + 8, 4 + 16, 32 ] => [ 1, 10, 20, 32 ]
 function addOdds(odds: number[], d: number[], idx: number): number[] {
-    d.forEach((o, i) => {
-        odds[idx + i] = odds[idx + i] || 0;
-        odds[idx + i] += o;
+    d.forEach((o, i) => odds[idx + i] += o);
+    return odds;
+}
+
+function subtractOdds(odds: number[], d: number[], x: number): number[] {
+    d.forEach((o, y) => {
+        const idx = x - y < 0 ? 0 : x - y;
+        odds[idx] += o;
     });
     return odds;
 }
