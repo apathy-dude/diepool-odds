@@ -1,3 +1,5 @@
+const globalCache: { [tn: number]: Odds[] } = {};
+
 // Dice: Number of dice to roll
 // TN: Target number where the die must be greater than or equal to
 export function Roll(dice: number, tn: number): Odds {
@@ -11,11 +13,22 @@ export function Roll(dice: number, tn: number): Odds {
         return arr;
     }
 
-    const rollCache: Odds[] = [ [1], [(tn - 1) / 6, (7 - tn) / 6] ];
+    const rollCache: Odds[] = globalCache[tn]
+        ? globalCache[tn]
+        : [ [1], [(tn - 1) / 6, (7 - tn) / 6] ];
     while (!rollCache[dice]) {
         const max = rollCache.length - 1;
         if (max * 2 <= dice) { // Double it to grow as quickly as possible
             rollCache[max * 2] = Add(rollCache[max], rollCache[max]);
+        }
+        else if (max > dice) {
+            let start = dice - 1;
+            while (!rollCache[start]) start--;
+
+            let add = dice - start;
+            while (!rollCache[add]) add--;
+
+            rollCache[start + add] = Add(rollCache[start], rollCache[add]);
         }
         else { // Add max and next highest that will add together to be at or below target
             let idx = dice - max;
@@ -25,6 +38,9 @@ export function Roll(dice: number, tn: number): Odds {
         }
     }
 
+    if (!globalCache[tn] || globalCache[tn].length < rollCache.length) {
+        globalCache[tn] = rollCache;
+    }
     return rollCache[dice];
 }
 
