@@ -38,12 +38,12 @@ export function SubtractMultiply(oddArray: number[], subArray: number[]): number
         .reduce(subtractOdds, initArray);
 }
 
-export function SubtractSingleMultiplyPerIndexWithBonus(oddArray: number[], singleTn: number, bonusPool: number): number[] {
+export function SubtractSingleMultiplyPerIndex(oddArray: number[], singleTn: number): number[] {
     if (singleTn > 6) return oddArray;
     const initArray = new Array(oddArray.length).fill(0);
 
     return oddArray
-        .map((o1: number, idx: number) => Roll(idx + bonusPool, singleTn)
+        .map((o1: number, idx: number) => Roll(idx, singleTn)
                 .map((o2: number) => o1 * o2))
         .reduce(subtractOdds, initArray);
 }

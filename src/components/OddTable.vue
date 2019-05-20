@@ -24,7 +24,7 @@ import Vue from 'vue';
 import Component from 'vue-class-component';
 import { Prop } from 'vue-property-decorator';
 import OddColumn from './OddColumn.vue';
-import { Roll, SubtractMultiply, SubtractSingleMultiplyPerIndexWithBonus } from '../services/OddsService';
+import { Roll, SubtractMultiply, SubtractSingleMultiplyPerIndex } from '../services/OddsService';
 import { mapFields } from 'vuex-map-fields';
 
 @Component({
@@ -36,7 +36,6 @@ import { mapFields } from 'vuex-map-fields';
     ...mapFields({
       attackBasePool: 'attack.basePool',
       defenceBaseTN: 'defence.baseTN',
-      defenceBonusPool: 'defence.bonusPool',
       defenceCounterPool: 'defence.counterPool',
       defenceCounterTN: 'defence.counterTN',
     }),
@@ -45,7 +44,6 @@ import { mapFields } from 'vuex-map-fields';
 export default class OddTable extends Vue {
   public attackBasePool!: number;
   public defenceBaseTN!: number;
-  public defenceBonusPool!: number;
   public defenceCounterPool!: number;
   public defenceCounterTN!: number;
 
@@ -54,7 +52,7 @@ export default class OddTable extends Vue {
     const counter: number[] = Roll(this.defenceCounterPool, this.defenceCounterTN);
     const postCounter: number[] = SubtractMultiply(attack, counter);
 
-    const roll: number[] = SubtractSingleMultiplyPerIndexWithBonus(postCounter, this.defenceBaseTN, this.defenceBonusPool);
+    const roll: number[] = SubtractSingleMultiplyPerIndex(postCounter, this.defenceBaseTN);
     const rollSum: number[] = [1];
     for (let i = 1; i < roll.length; i++)
       rollSum[i] = rollSum[i - 1] - roll[i - 1];

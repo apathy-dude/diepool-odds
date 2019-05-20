@@ -12,7 +12,6 @@ export default new Vuex.Store({
     },
     defence: {
       baseTN: 6,
-      bonusPool: 0,
       counterPool: 0,
       counterTN: 6,
     },

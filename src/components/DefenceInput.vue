@@ -6,13 +6,6 @@
           <h3 class="headline mb-0">Defence</h3>
           <v-layout row wrap>
             <v-text-field
-              label="Bonus Pool"
-              type="number"
-              v-model="bonusPool"
-              full-width
-              hide-details
-            ></v-text-field>
-            <v-text-field
               label="Base Target Number"
               type="number"
               v-model="baseTN"
@@ -57,7 +50,6 @@ const { mapFields } = createHelpers({
   computed: {
     ...mapFields([
       'defence.baseTN',
-      'defence.bonusPool',
       'defence.counterPool',
       'defence.counterTN',
     ]),
