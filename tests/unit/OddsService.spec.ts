@@ -53,7 +53,7 @@ describe('OddsService.ts Roll', () => {
   });
 });
 
-describe('OddsService.ts SubtractSingleMultiplyPerIndex', () => {
+describe('OddsService.ts Subtract using Func', () => {
   it('Halves a single hit when there\'s a 50% to subtract a single hit', () => {
     const halfSingleHit = [0.5, 0.5];
     const response = Subtract(halfSingleHit, SubtractTNPerIndex(4));
@@ -73,7 +73,7 @@ describe('OddsService.ts SubtractSingleMultiplyPerIndex', () => {
   });
 });
 
-describe('OddsService.ts Subtract', () => {
+describe('OddsService.ts Subtract using Array', () => {
   it('Multiplies properly for r(2, 4) - r(2, 4)', () => {
     const original = Roll(2, 4); // [ 0.25, 0.5, 0.25 ]
     const response = Subtract(original, original);
