@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { Roll, SubtractSingleMultiplyPerIndex, SubtractMultiply } from '@/services/OddsService';
+import { Roll, Subtract, SubtractTNPerIndex } from '@/services/OddsService';
 
 describe('OddsService.ts Roll', () => {
   it('Returns 100% chance of 0 hits on 0 dice', () => {
@@ -56,14 +56,14 @@ describe('OddsService.ts Roll', () => {
 describe('OddsService.ts SubtractSingleMultiplyPerIndex', () => {
   it('Halves a single hit when there\'s a 50% to subtract a single hit', () => {
     const halfSingleHit = [0.5, 0.5];
-    const response = SubtractSingleMultiplyPerIndex(halfSingleHit, 4);
+    const response = Subtract(halfSingleHit, SubtractTNPerIndex(4));
     expect(response).to.eql([0.75, 0.25]);
   });
 
   it('Multiplies 6+ properly for 4+ on 2d6', () => {
     const original = Roll(2, 4); // [ 0.25, 0.5, 0.25]
     const target = 6; // 1/6
-    const response = SubtractSingleMultiplyPerIndex(original, target)
+    const response = Subtract(original, SubtractTNPerIndex(target))
       .map((r: number) => r.toFixed(6));
     const ex = [49 / 144, 70 / 144, 25 / 144]
       .map((r: number) => r.toFixed(6));
@@ -73,10 +73,10 @@ describe('OddsService.ts SubtractSingleMultiplyPerIndex', () => {
   });
 });
 
-describe('OddsService.ts SubtractMultiply', () => {
+describe('OddsService.ts Subtract', () => {
   it('Multiplies properly for r(2, 4) - r(2, 4)', () => {
     const original = Roll(2, 4); // [ 0.25, 0.5, 0.25 ]
-    const response = SubtractMultiply(original, original);
+    const response = Subtract(original, original);
     const ex = [11 / 16, 4 / 16, 1 / 16];
     expect(response).to.eql(ex);
   });
@@ -84,7 +84,7 @@ describe('OddsService.ts SubtractMultiply', () => {
   it('Multiplies properly for r(2, 4) - r(1, 6)', () => {
     const original = Roll(2, 4); // [ 0.25, 0.5, 0.25 ]
     const sub = Roll(1, 6); // [ 5/6, 1/6 ]
-    const response = SubtractMultiply(original, sub)
+    const response = Subtract(original, sub)
       .map((r: number) => r.toFixed(6));
     const ex = [8 / 24, 11 / 24, 5 / 24]
       .map((r: number) => r.toFixed(6));
@@ -96,7 +96,7 @@ describe('OddsService.ts SubtractMultiply', () => {
   it('Multiplies properly for r(1, 6) - r(2, 4)', () => {
     const original = Roll(1, 6); // [ 5/6, 1/6 ]
     const sub = Roll(2, 4); // [ 0.25, 0.5, 0.25 ]
-    const response = SubtractMultiply(original, sub)
+    const response = Subtract(original, sub)
       .map((r: number) => r.toFixed(6));
     const ex = [23 / 24, 1 / 24]
       .map((r: number) => r.toFixed(6));

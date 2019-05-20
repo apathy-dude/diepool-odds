@@ -24,7 +24,7 @@ import Vue from 'vue';
 import Component from 'vue-class-component';
 import { Prop } from 'vue-property-decorator';
 import OddColumn from './OddColumn.vue';
-import { Roll, SubtractMultiply, SubtractSingleMultiplyPerIndex } from '../services/OddsService';
+import { Roll, Subtract, SubtractTNPerIndex } from '../services/OddsService';
 import { mapFields } from 'vuex-map-fields';
 
 @Component({
@@ -50,9 +50,9 @@ export default class OddTable extends Vue {
   public rollSum(tn: number): number[] {
     const attack: number[] = Roll(this.attackBasePool, tn);
     const counter: number[] = Roll(this.defenceCounterPool, this.defenceCounterTN);
-    const postCounter: number[] = SubtractMultiply(attack, counter);
+    const postCounter: number[] = Subtract(attack, counter);
 
-    const roll: number[] = SubtractSingleMultiplyPerIndex(postCounter, this.defenceBaseTN);
+    const roll: number[] = Subtract(postCounter, SubtractTNPerIndex(this.defenceBaseTN));
     const rollSum: number[] = [1];
     for (let i = 1; i < roll.length; i++)
       rollSum[i] = rollSum[i - 1] - roll[i - 1];
